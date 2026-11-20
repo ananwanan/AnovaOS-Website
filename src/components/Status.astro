@@ -1,0 +1,6 @@
+---
+import { statusNames, translator, type Lang } from '../lib/site';
+const { lang, status } = Astro.props as { lang: Lang; status: string };
+---
+
+<span class={'status ' + status}><i></i>{translator(lang)(...statusNames[status])}</span>

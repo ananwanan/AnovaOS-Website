@@ -1,0 +1,74 @@
+---
+import Intro from './Intro.astro';
+import Icon from './Icon.astro';
+import Status from './Status.astro';
+import { data, source } from '../lib/evidence';
+import { translator, statusNames, type Lang } from '../lib/site';
+const { lang } = Astro.props as { lang: Lang };
+const t = translator(lang);
+---
+
+<Intro
+  code="DEVELOPMENT ROADMAP"
+  title={t('开发路线', 'Development roadmap')}
+  desc={t(
+    '从第一次 UEFI 启动，到在系统内构建自己的工具链。展开里程碑，查看实际成果及仍待满足的条件。',
+    'From the first UEFI boot to reconstructing a toolchain inside the guest. Open a milestone to inspect outcomes and outstanding conditions.',
+  )}
+/>
+<section class="container section timeline">
+  <div class="section-head">
+    <span class="mono muted">dev · {data.sha.slice(0, 7)}</span><label class="filter"
+      >{t('筛选状态', 'Filter by status')}
+      <select id="filter"
+        ><option value="all">{t('全部状态', 'All statuses')}</option>{
+          Object.entries(statusNames)
+            .filter(([key]) => data.roadmap.some((r) => r.status === key))
+            .map(([key, name]) => <option value={key}>{t(...name)}</option>)
+        }</select
+      ></label>
+  </div>
+  {
+    data.roadmap.toReversed().map((m) => (
+      <details class="milestone" id={m.id} data-status={m.status} open={m.id === 'M18'}>
+        <>
+          <summary>
+            <>
+              <strong class="mile-id">{m.id}</strong>
+              <span>{t(m.zh, m.en)}</span>
+              <Status lang={lang} status={m.status} />
+              <Icon name="plus" size={18} />
+            </>
+          </summary>
+          <div class="mile-body">
+            <>
+              <p>{t(m.goalZh, m.goalEn)}</p>
+              <p>{t(m.detailZh, m.detailEn)}</p>
+              <a class="text-link" href={source(lang, m.doc)}>
+                <Icon name="book" size={16} />
+                {t('上游阶段记录', 'Upstream record')}
+              </a>
+            </>
+          </div>
+        </>
+      </details>
+    ))
+  }
+</section>
+<script>
+  const filter = document.querySelector<HTMLSelectElement>('#filter');
+  filter?.addEventListener('change', () =>
+    document.querySelectorAll<HTMLDetailsElement>('.milestone').forEach((el) => {
+      el.hidden = filter.value !== 'all' && el.dataset.status !== filter.value;
+    }),
+  );
+  function reveal() {
+    const el = document.getElementById(location.hash.slice(1));
+    if (el instanceof HTMLDetailsElement) {
+      el.open = true;
+      el.scrollIntoView();
+    }
+  }
+  if (location.hash) reveal();
+  window.addEventListener('hashchange', reveal);
+</script>

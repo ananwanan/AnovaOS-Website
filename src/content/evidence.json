@@ -1,0 +1,339 @@
+{
+  "sha": "a2a16a635d961713a7fd1b802234626a8b82c0cc",
+  "checked": "2026-11-20",
+  "sourceRepo": "ananwanan/AnovaOS",
+  "sourceBranch": "dev",
+  "license": "Apache-2.0",
+  "roadmap": [
+    {
+      "id": "M0",
+      "status": "verified",
+      "doc": "docs/en/validation/M0-M1.md",
+      "zh": "工程基线",
+      "en": "Engineering baseline",
+      "goalZh": "统一内核构建、依赖检查与镜像入口。",
+      "goalEn": "Make kernel builds, dependency checks and image creation reproducible.",
+      "detailZh": "Cargo 工作区隔离宿主 xtask 与裸机内核，校验引导输入。",
+      "detailEn": "The workspace separates the host xtask from the bare-metal kernel and verifies boot inputs."
+    },
+    {
+      "id": "M1",
+      "status": "verified",
+      "doc": "docs/en/validation/M0-M1.md",
+      "zh": "UEFI 引导与日志",
+      "en": "UEFI boot and logging",
+      "goalZh": "在 q35 / OVMF 下通过 Limine 引导。",
+      "goalEn": "Boot through Limine on q35 with OVMF.",
+      "detailZh": "串口保留启动阶段和故障信息，smoke 检查有序标记与退出结果。",
+      "detailEn": "Serial logs identify boot phases and failures. Smoke tests check ordered markers and exit status."
+    },
+    {
+      "id": "M2",
+      "status": "verified",
+      "doc": "docs/en/validation/M2.md",
+      "zh": "异常、中断与时钟",
+      "en": "Exceptions, interrupts and time",
+      "goalZh": "建立启动处理器的异常处理与定时中断。",
+      "goalEn": "Handle exceptions and timer interrupts on the bootstrap processor.",
+      "detailZh": "验证 GDT、IDT、ACPI 与 LAPIC 定时器。外设中断仍屏蔽，I/O APIC 标识差异已有单独回归。",
+      "detailEn": "The profile covers GDT, IDT, ACPI and the LAPIC timer. Peripheral interrupts remain masked, with a regression for differing I/O APIC IDs."
+    },
+    {
+      "id": "M3",
+      "status": "verified",
+      "doc": "docs/en/validation/M3.md",
+      "zh": "页表与内存分配",
+      "en": "Page tables and allocation",
+      "goalZh": "接管页表并保护内核堆和执行栈。",
+      "goalEn": "Own page tables and protect the kernel heap and stack.",
+      "detailZh": "实测页回收、保护页、只读与 NX 故障，以及内存耗尽恢复。",
+      "detailEn": "Tests exercise frame reclamation, guard pages, read-only and NX faults, and allocation failure."
+    },
+    {
+      "id": "M4",
+      "status": "verified",
+      "doc": "docs/en/validation/M4.md",
+      "zh": "用户态与原生 ABI",
+      "en": "User space and native ABI",
+      "goalZh": "运行独立地址空间中的 Ring 3 程序。",
+      "goalEn": "Run Ring 3 applications in private address spaces.",
+      "detailZh": "原生 C 和 Rust ELF 使用受检系统调用，错误指针及用户故障被隔离。",
+      "detailEn": "Native C and Rust executables use checked system calls. Invalid pointers and user faults are isolated."
+    },
+    {
+      "id": "M5",
+      "status": "verified",
+      "doc": "docs/en/validation/M5.md",
+      "zh": "进程与调度",
+      "en": "Processes and scheduling",
+      "goalZh": "建立单处理器上的用户抢占与阻塞等待。",
+      "goalEn": "Preempt user processes and block waiting tasks on one CPU.",
+      "detailZh": "支持 fork、exec、wait 和上下文恢复；SMP 与内核抢占另行规划。",
+      "detailEn": "The gate covers fork, exec, wait and context restoration. SMP and kernel preemption are outside this profile."
+    },
+    {
+      "id": "M6",
+      "status": "verified",
+      "doc": "docs/en/validation/M6.md",
+      "zh": "VFS、init 与 shell",
+      "en": "VFS, init and shell",
+      "goalZh": "让应用通过统一文件接口与管道协作。",
+      "goalEn": "Connect applications through files and pipes.",
+      "detailZh": "验证 initramfs、tmpfs、devfs、重定向、文件描述符及原生 shell；tmpfs 为易失存储。",
+      "detailEn": "The native shell exercises initramfs, tmpfs, devfs, descriptor handling and redirection. The tmpfs mount is volatile."
+    },
+    {
+      "id": "M7",
+      "status": "verified",
+      "doc": "docs/en/validation/M7.md",
+      "zh": "磁盘持久化与编辑",
+      "en": "Persistent storage and editing",
+      "goalZh": "在 virtio-blk 上保存文本与可执行文件。",
+      "goalEn": "Keep edited sources and executables on virtio-blk storage.",
+      "detailZh": "受控 ext2 卷经正常关机、重启与 e2fsck 检查；此卷没有日志恢复。",
+      "detailEn": "A bounded ext2 volume passed clean shutdown, reboot and e2fsck checks. This volume has no journal recovery."
+    },
+    {
+      "id": "M8",
+      "status": "verified",
+      "doc": "docs/en/validation/M8.md",
+      "zh": "静态 Linux 命令行",
+      "en": "Static Linux CLI",
+      "goalZh": "为固定构建的 musl 程序提供 Linux ABI 子集。",
+      "goalEn": "Provide a Linux ABI subset for pinned musl executables.",
+      "detailZh": "验证选定 BusyBox 命令、文件操作、管道和重定向，范围以兼容性表为准。",
+      "detailEn": "Selected BusyBox applets, file operations, pipes and redirection passed. The compatibility matrix defines the accepted subset."
+    },
+    {
+      "id": "M9",
+      "status": "verified",
+      "doc": "docs/en/validation/M9.md",
+      "zh": "线程、PTY 与动态 musl",
+      "en": "Threads, PTYs and dynamic musl",
+      "goalZh": "覆盖受控的动态加载与终端运行时。",
+      "goalEn": "Support dynamic loading and terminal primitives for selected programs.",
+      "detailZh": "验证 pthread、TLS、futex、信号及四个 PTY；完整作业控制与 glibc 尚未验证。",
+      "detailEn": "Tests cover pthreads, TLS, futexes, signals and four PTYs. Full job control and glibc remain unverified."
+    },
+    {
+      "id": "M10",
+      "status": "verified",
+      "doc": "docs/en/validation/M10.md",
+      "zh": "网络与软件包",
+      "en": "Networking and packages",
+      "goalZh": "以受控网络验证连接与软件包生命周期。",
+      "goalEn": "Exercise network clients and package lifecycles on a controlled network.",
+      "detailZh": "轮询 virtio-net 支持 IPv4、TCP/UDP、有限 DNS；验证 TLS、哈希、升级与回滚。",
+      "detailEn": "Polled virtio-net serves IPv4, TCP/UDP and bounded DNS. Tests cover TLS, hashes, upgrades and rollback."
+    },
+    {
+      "id": "M11",
+      "status": "verified",
+      "doc": "docs/en/validation/M11.md",
+      "zh": "系统内 C / C++ 开发",
+      "en": "In-guest C and C++",
+      "goalZh": "在 AnovaOS 内编辑、编译并运行程序。",
+      "goalEn": "Edit, compile and run applications inside AnovaOS.",
+      "detailZh": "宿主准备 GCC/G++、binutils 与 make，来宾实际完成编译；已测试异常、线程与重启保留。",
+      "detailEn": "Host-prepared GCC/G++, binutils and make perform real guest builds. Exceptions, threads and reboot retention were tested."
+    },
+    {
+      "id": "M12",
+      "status": "verified",
+      "doc": "docs/en/validation/M12.md",
+      "zh": "系统内 Rust / Cargo",
+      "en": "In-guest Rust and Cargo",
+      "goalZh": "运行固定 Rust 工具并构建 musl 应用。",
+      "goalEn": "Run pinned Rust tools and build musl applications.",
+      "detailZh": "离线依赖、build.rs、过程宏及受控 HTTPS 已验证。工具二进制来自上游，原生 AnovaOS std 仍独立规划。",
+      "detailEn": "Offline builds, build.rs, procedural macros and bounded HTTPS passed. The tools are upstream binaries. Native AnovaOS std is a separate goal."
+    },
+    {
+      "id": "M13",
+      "status": "verified",
+      "doc": "docs/en/validation/M13.md",
+      "zh": "SDK 与软件包规范",
+      "en": "SDK and package contracts",
+      "goalZh": "统一原生应用的创建、编译、打包与诊断。",
+      "goalEn": "Unify native app creation, building, packaging and diagnostics.",
+      "detailZh": "C、C++、Rust 模板使用版本化 SDK 和 ANOVAPK2；校验 ABI 并支持故障符号化。",
+      "detailEn": "C, C++ and Rust templates use a versioned SDK and ANOVAPK2, with ABI admission and fault symbolization."
+    },
+    {
+      "id": "M14",
+      "status": "verified",
+      "doc": "docs/en/validation/M14.4.md",
+      "zh": "图形栈与三语言 SDK",
+      "en": "Graphics and three SDKs",
+      "goalZh": "从受检帧缓冲走向用户态窗口合成。",
+      "goalEn": "Extend a checked framebuffer into a user-space compositor.",
+      "detailZh": "M14.1–14.5 已本地验收。桌面使用软件合成，VirGL 验收范围为离屏清除、回读及回退。",
+      "detailEn": "M14.1–14.5 have local acceptance. Desktop composition uses software rendering. VirGL coverage is limited to offscreen clear, readback and fallback."
+    },
+    {
+      "id": "M15",
+      "status": "conditional",
+      "doc": "docs/en/validation/M15.6.md",
+      "zh": "工具与内核重构",
+      "en": "Tool and kernel reconstruction",
+      "goalZh": "在来宾内从源码重建工具与内核。",
+      "goalEn": "Reconstruct selected tools and the kernel inside the guest.",
+      "detailZh": "bzip2 与内核的重复干净构建已验证，引导镜像由宿主打包。GCC、LLVM/rustc/Cargo 完成可行性评估，编译器重构仍受阻。",
+      "detailEn": "Repeated clean bzip2 and kernel builds passed with host-assisted image packaging. GCC and LLVM/rustc/Cargo feasibility was assessed. Compiler reconstruction remains blocked."
+    },
+    {
+      "id": "M16",
+      "status": "conditional",
+      "doc": "docs/en/validation/M16_CAPACITY.md",
+      "zh": "VFS 与受控 ext4",
+      "en": "VFS and controlled ext4",
+      "goalZh": "扩展文件后端、日志恢复与开发容量。",
+      "goalEn": "Expand storage backends, journal recovery and build capacity.",
+      "detailZh": "ext4 读写、JBD2、全新工作盘迁移和资源耗尽后内核构建已本地验收。完整远程 CI 收尾延期。",
+      "detailEn": "Controlled ext4 reads/writes, JBD2 recovery, fresh-disk migration and kernel builds after exhaustion passed locally. Full remote CI closeout is deferred."
+    },
+    {
+      "id": "M17",
+      "status": "verified",
+      "doc": "docs/en/validation/M17.5.md",
+      "zh": "开发桌面",
+      "en": "Development desktop",
+      "goalZh": "在图形会话中编辑、编译和运行固定应用。",
+      "goalEn": "Edit, build and run fixed application recipes in a graphical session.",
+      "detailZh": "M17.1–17.5 的受监督会话、真实 PTY、文件编辑、监控与三语言工作流通过本地 QEMU 验收。物理硬件另需验证。",
+      "detailEn": "Local QEMU evidence covers the supervised session, real PTY, editor, monitor and three-language recipes across M17.1–17.5. Physical hardware needs separate validation."
+    },
+    {
+      "id": "M18",
+      "status": "conditional",
+      "doc": "docs/en/ROADMAP.md",
+      "zh": "有条件的系统自举",
+      "en": "Conditional self-hosting",
+      "goalZh": "分别复查编译器重构和纯来宾镜像生成的前置条件。",
+      "goalEn": "Reassess prerequisites for compiler reconstruction and guest-only boot images independently.",
+      "detailZh": "GCC、LLVM/rustc/Cargo、镜像生成与可重复构建均为后续目标。镜像路线可独立评估，当前没有完成记录。",
+      "detailEn": "GCC, LLVM/rustc/Cargo, image creation and repeatability each have separate future gates. The image path can be assessed independently."
+    }
+  ],
+  "features": [
+    {
+      "id": "kernel",
+      "status": "verified",
+      "doc": "docs/en/validation/M3.md",
+      "zh": "Rust 内核与内存",
+      "en": "Rust kernel and memory",
+      "goalZh": "no_std Rust 内核接管四级页表，管理物理页、堆与隔离地址空间。",
+      "goalEn": "A no_std Rust kernel owns four-level page tables, physical frames, the heap and isolated address spaces.",
+      "detailZh": "本地测试覆盖保护页、NX、越界与内存耗尽。当前内核堆固定为 16 MiB。",
+      "detailEn": "Local tests exercise guard pages, NX, bounds and allocation failure. The kernel currently uses a fixed 16 MiB heap."
+    },
+    {
+      "id": "process",
+      "status": "limited",
+      "doc": "docs/en/milestones/M5_PROCESSES.md",
+      "zh": "进程与调度",
+      "en": "Processes and scheduling",
+      "goalZh": "在单个启动处理器上运行 Ring 3 进程，支持用户抢占、阻塞、fork、exec 和 wait。",
+      "goalEn": "Ring 3 processes on one bootstrap CPU support user preemption, blocking, fork, exec and wait.",
+      "detailZh": "32 个槽位由进程与线程共享。内核不可抢占，尚未验证 SMP。",
+      "detailEn": "Processes and threads share 32 slots. The kernel is non-preemptible and SMP remains unverified."
+    },
+    {
+      "id": "filesystem",
+      "status": "limited",
+      "doc": "docs/en/validation/M16.5.md",
+      "zh": "文件系统与持久化",
+      "en": "Filesystems and persistence",
+      "goalZh": "VFS 连接内存文件系统、ext2 和受控 ext4。JBD2 工作卷提供日志重放。",
+      "goalEn": "The VFS connects memory filesystems, ext2 and controlled ext4. JBD2 work volumes support journal replay.",
+      "detailZh": "ext4 接受声明的特性集合，单文件上限 256 MiB。ext2 单文件上限 4 MiB，不带日志。",
+      "detailEn": "Only declared ext4 features are accepted. Files are bounded to 256 MiB on controlled ext4 and 4 MiB on non-journaled ext2."
+    },
+    {
+      "id": "native",
+      "status": "verified",
+      "doc": "docs/en/validation/M13.md",
+      "zh": "原生应用开发",
+      "en": "Native application development",
+      "goalZh": "用 C、C++ 或 Rust 模板建立应用，通过原生 ABI 运行并打包。",
+      "goalEn": "Create native applications from C, C++ or Rust templates, run them via the native ABI and package them.",
+      "detailZh": "包准入检查架构与 ABI，工具可符号化用户故障。应用权限清单仅是准入元数据。",
+      "detailEn": "Package admission checks architecture and ABI. Tools symbolize user faults. Declared permissions are admission metadata."
+    },
+    {
+      "id": "toolchain",
+      "status": "limited",
+      "doc": "docs/en/guides/TOOLCHAINS.md",
+      "zh": "来宾工具链",
+      "en": "In-guest toolchains",
+      "goalZh": "在 AnovaOS 内用 GCC/G++ 与 Rust/Cargo 完成经过验证的编辑、构建和运行流程。",
+      "goalEn": "Use GCC/G++ and Rust/Cargo inside AnovaOS for verified edit, build and run workflows.",
+      "detailZh": "依赖宿主准备的种子工具与 musl 环境；原生 Rust std、编译器源码自举仍待独立验证。",
+      "detailEn": "These profiles require host-prepared seed tools and a musl environment. Native Rust std and compiler reconstruction have separate gates."
+    },
+    {
+      "id": "linux",
+      "status": "limited",
+      "doc": "docs/en/COMPATIBILITY.md",
+      "zh": "Linux 软件兼容性",
+      "en": "Linux software compatibility",
+      "goalZh": "显式 Linux ABI 适配层支持特定 musl ELF、BusyBox 命令和动态库。",
+      "goalEn": "An explicit Linux ABI adapter runs selected musl executables, BusyBox applets and shared libraries.",
+      "detailZh": "兼容性按软件、版本、构建参数与操作逐项记录。通用 glibc 应用尚未验证。",
+      "detailEn": "Compatibility is tracked by program, version, build configuration and operation. General glibc applications remain unverified."
+    },
+    {
+      "id": "desktop",
+      "status": "verified",
+      "doc": "docs/en/validation/M17.1.md",
+      "zh": "桌面与窗口系统",
+      "en": "Desktop and windows",
+      "goalZh": "Rust 用户态合成器管理窗口、焦点与输入。启动器提供文件、构建及服务入口。",
+      "goalEn": "A Rust user-space compositor manages windows, focus and input. The launcher provides file, build and service controls.",
+      "detailZh": "本地 QEMU 的有限客户端会话已验证，普通桌面采用软件合成。",
+      "detailEn": "Local QEMU tests cover the bounded client session. The normal desktop uses software composition."
+    },
+    {
+      "id": "terminal",
+      "status": "verified",
+      "doc": "docs/en/validation/M17.2.md",
+      "zh": "图形 PTY 终端",
+      "en": "Graphical PTY terminal",
+      "goalZh": "图形终端连接真实 Linux-musl PTY，处理 shell 输入、Ctrl+C、调整大小和回滚查看。",
+      "goalEn": "The graphical terminal connects to a real Linux-musl PTY, with shell input, Ctrl+C, resizing and scrollback.",
+      "detailZh": "验证包括真实 GCC 编译与重启后文件字节比对；支持有限 ANSI 序列和历史缓冲区。",
+      "detailEn": "The gate includes a real GCC compile and exact file-byte checks after reboot. ANSI handling and scrollback are bounded."
+    },
+    {
+      "id": "devices",
+      "status": "limited",
+      "doc": "docs/en/validation/M10.md",
+      "zh": "网络与设备",
+      "en": "Networking and devices",
+      "goalZh": "q35 / OVMF 配置下使用 virtio-blk、可选 virtio-net、PS/2 和 VGA。",
+      "goalEn": "The q35/OVMF profile uses virtio-blk, optional virtio-net, PS/2 and VGA.",
+      "detailZh": "网络为轮询 IPv4 客户端及有限 DNS。外设 IRQ 仍屏蔽，USB、物理硬件及通用 GPU 驱动尚未验证。",
+      "detailEn": "Networking covers polled IPv4 clients and bounded DNS. Peripheral IRQs remain masked. USB, physical hardware and general GPU drivers remain unverified."
+    }
+  ],
+  "updates": [
+    {
+      "titleZh": "修复 I/O APIC 标识差异引起的启动故障",
+      "titleEn": "Boot fix for differing I/O APIC IDs",
+      "sha": "a2a16a635d961713a7fd1b802234626a8b82c0cc",
+      "date": "2026-11-14"
+    },
+    {
+      "titleZh": "M17 开发桌面合入 dev",
+      "titleEn": "M17 development desktop merged into dev",
+      "sha": "648a99ff95f1ee50759d859310461b6593d64a28",
+      "date": "2026-11-14"
+    },
+    {
+      "titleZh": "在桌面显示启动与替换失败信息",
+      "titleEn": "Desktop shows launch and replacement failures",
+      "sha": "d3533a33d26fdfafe5cfc72135862070fd3045f4",
+      "date": "2026-11-14"
+    }
+  ]
+}

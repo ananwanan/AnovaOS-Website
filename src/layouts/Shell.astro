@@ -1,0 +1,165 @@
+---
+import Icon from '../components/Icon.astro';
+import { labels, link, translator, os, type Lang } from '../lib/site';
+import '@fontsource-variable/space-grotesk/index.css';
+import '@fontsource/ibm-plex-mono/latin-400.css';
+import '../style.css';
+interface Props {
+  lang: Lang;
+  path: string;
+  title: string;
+  description: string;
+}
+const { lang, path, title, description } = Astro.props;
+const t = translator(lang),
+  current = path.split('/')[0],
+  alternate = lang === 'zh' ? 'en' : 'zh';
+const origin = Astro.site,
+  pageTitle = title + ' · AnovaOS';
+---
+
+<!doctype html>
+<html lang={lang === 'zh' ? 'zh-CN' : 'en'} data-theme="dark">
+  <head
+    ><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title><meta name="description" content={description} /><meta
+      name="theme-color"
+      content="#080e14"
+    />
+    <meta property="og:type" content="website" /><meta
+      property="og:site_name"
+      content="AnovaOS"
+    /><meta property="og:title" content={pageTitle} /><meta
+      property="og:description"
+      content={description}
+    /><meta property="og:locale" content={lang === 'zh' ? 'zh_CN' : 'en_US'} />
+    {origin && <link rel="canonical" href={new URL(link(lang,path),origin)} />}
+    {origin && <meta property="og:url" content={new URL(link(lang,path),origin)} />}
+    {
+      origin && (
+        <>
+          <meta property="og:image" content={new URL('/social.png', origin)} />
+          {(['zh', 'en'] as const).map((l) => (
+            <link
+              rel="alternate"
+              hreflang={l === 'zh' ? 'zh-CN' : 'en'}
+              href={new URL(link(l, path), origin)}
+            />
+          ))}
+          <link rel="alternate" hreflang="x-default" href={new URL(link('zh', path), origin)} />
+        </>
+      )
+    }
+    <link rel="icon" type="image/svg+xml" href="/mark.svg" />
+    <script is:inline>
+      try {
+        document.documentElement.dataset.theme =
+          localStorage.getItem('anova-theme') === 'light' ? 'light' : 'dark';
+      } catch { /* Default to dark when storage is unavailable. */ }
+    </script>
+  </head><body>
+    <a class="skip" href="#main">{t('跳至正文', 'Skip to content')}</a>
+    <header class="mast">
+      <div class="container navbar">
+        <a class="brand" href={link(lang)} aria-label={t('AnovaOS 首页', 'AnovaOS home')}
+          ><img src="/mark.svg" width="35" height="35" alt="" />Anova<span>OS</span></a
+        >
+        <nav class="main-nav" id="main-nav" aria-label={t('主导航', 'Main navigation')}>
+          {
+            (Object.keys(labels) as (keyof typeof labels)[])
+              .filter((p) => p !== 'contributing')
+              .map((p) => (
+                <a href={link(lang, p)} aria-current={p === current ? 'page' : undefined}>
+                  {t(labels[p][0], labels[p][1])}
+                </a>
+              ))
+          }
+        </nav>
+        <div class="tools">
+          <a class="ghnav" href={os}><Icon name="github" size={17} />GitHub</a><span class="divider"
+          ></span><a
+            class="language"
+            lang={alternate === 'zh' ? 'zh-CN' : 'en'}
+            href={link(alternate, path)}
+            aria-label={t('Switch to English', '切换到中文')}
+            ><Icon name="lang" size={17} />{t('EN', '中文')}</a
+          >
+          <button
+            id="theme"
+            class="square"
+            aria-label={t('切换浅色主题', 'Switch to light theme')}
+            data-light={t('切换浅色主题', 'Switch to light theme')}
+            data-dark={t('切换深色主题', 'Switch to dark theme')}
+            ><span class="sun"><Icon name="sun" size={19} /></span><span class="moon"
+              ><Icon name="moon" size={19} /></span
+            ></button
+          >
+          <button
+            id="nav-toggle"
+            class="square"
+            aria-controls="main-nav"
+            aria-expanded="false"
+            aria-label={t('导航菜单', 'Navigation menu')}><Icon name="menu" /></button>
+        </div>
+      </div>
+    </header>
+    <main id="main" tabindex="-1"><slot /></main>
+    <footer>
+      <div class="container foot">
+        <div>
+          <a class="brand" href={link(lang)}
+            ><img src="/mark.svg" width="28" height="28" alt="" />Anova<span>OS</span></a
+          ><p>
+            {
+              t(
+                '使用 Rust 从零构建的 x86_64 操作系统。',
+                'An x86_64 operating system built from scratch in Rust.',
+              )
+            }
+          </p>
+        </div><div class="footlinks">
+          <a href={link(lang, 'docs')}>{t('开发文档', 'Documentation')}</a><a
+            href={link(lang, 'contributing')}>{t('参与贡献', 'Contributing')}</a
+          ><a href={os}>GitHub</a>
+        </div>
+      </div>
+    </footer>
+    <script>
+      const theme = document.querySelector<HTMLButtonElement>('#theme')!;
+      function label() {
+        theme.setAttribute(
+          'aria-label',
+          (document.documentElement.dataset.theme === 'light'
+            ? theme.dataset.dark
+            : theme.dataset.light)!,
+        );
+      }
+      label();
+      theme.addEventListener('click', () => {
+        const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = next;
+        try {
+          localStorage.setItem('anova-theme', next);
+        } catch {
+          /* storage may be disabled */
+        }
+        label();
+      });
+      const toggle = document.querySelector<HTMLButtonElement>('#nav-toggle')!;
+      const nav = document.getElementById('main-nav')!;
+      function closeMenu() {
+        nav.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+      toggle.addEventListener('click', () => {
+        const open = nav.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', String(open));
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && nav.classList.contains('open')) {
+          closeMenu();
+          toggle.focus();
+        }
+      });
+    </script></body>
+</html>

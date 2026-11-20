@@ -1,0 +1,108 @@
+---
+import Icon from './Icon.astro';
+import { docs, docNames, docPath, translator, type Lang, type Doc } from '../lib/site';
+import type { MarkdownInstance } from 'astro';
+const {
+  lang,
+  id = 'intro',
+  standalone = false,
+} = Astro.props as { lang: Lang; id?: Doc; standalone?: boolean };
+const t = translator(lang);
+const articles = import.meta.glob<MarkdownInstance<{ title: string }>>('../articles/*/*.md', {
+  eager: true,
+});
+const article = (slug: Doc) => articles['../articles/' + lang + '/' + slug + '.md'];
+const { Content, getHeadings, frontmatter } = article(id);
+const headings = getHeadings().filter((h) => h.depth === 2),
+  index = docs.indexOf(id),
+  items = docs.map((s) => ({
+    title: t(...docNames[s]),
+    path: docPath(lang, s),
+    text: article(s)
+      .rawContent()
+      .replace(/https?:\/\/\S+/g, ''),
+  }));
+---
+
+<div class="container docs-shell">
+  <aside class="docs-side">
+    <div class="kicker">DOCUMENTATION</div><label class="searchbox"
+      ><Icon name="search" size={17} /><input
+        id="doc-search"
+        type="search"
+        placeholder={t('搜索文档', 'Search docs')}
+        aria-label={t('搜索全部文档', 'Search all documentation')}
+      /></label
+    ><div
+      class="search-results"
+      hidden
+      id="results"
+      data-empty={t('没有匹配的文档', 'No matching documents')}
+      aria-live="polite"
+    >
+    </div><nav aria-label={t('文档章节', 'Documentation pages')}>
+      {
+        items.map((item, i) => (
+          <a aria-current={docs[i] === id ? 'page' : undefined} href={item.path}>
+            {item.title}
+          </a>
+        ))
+      }
+    </nav>
+  </aside>
+  <article class="article">
+    <div class="kicker">{standalone ? 'CONTRIBUTING' : 'ANOVAOS DOCS'}</div><h1>
+      {standalone ? t('参与贡献', 'Contributing') : frontmatter.title}
+    </h1><div class="prose"><Content /></div><div class="pager">
+      {
+        index > 0 && (
+          <a href={docPath(lang, docs[index - 1])}>
+            <small>{t('上一页', 'Previous')}</small>
+            {t(...docNames[docs[index - 1]])}
+          </a>
+        )
+      }{
+        docs[index + 1] && (
+          <a href={docPath(lang, docs[index + 1])}>
+            <small>{t('下一页', 'Next')}</small>
+            {t(...docNames[docs[index + 1]])}
+          </a>
+        )
+      }
+    </div>
+  </article>
+  <aside class="toc">
+    <strong>{t('本页目录', 'On this page')}</strong>{
+      headings.map((h) => <a href={'#' + h.slug}>{h.text}</a>)
+    }
+  </aside>
+</div>
+<script
+  id="search-index"
+  type="application/json"
+  set:html={JSON.stringify(items).replaceAll('<', '\\u003c')}
+  is:inline
+/>
+<script>
+  const input = document.querySelector<HTMLInputElement>('#doc-search');
+  const output = document.querySelector<HTMLElement>('#results');
+  const data = JSON.parse(document.getElementById('search-index')?.textContent || '[]') as {
+    title: string;
+    path: string;
+    text: string;
+  }[];
+  input?.addEventListener('input', () => {
+    if (!output) return;
+    const q = input.value.trim().toLocaleLowerCase();
+    output.replaceChildren();
+    output.hidden = !q;
+    if (!q) return;
+    for (const r of data.filter((v) => (v.title + ' ' + v.text).toLocaleLowerCase().includes(q))) {
+      const a = document.createElement('a');
+      a.textContent = r.title;
+      a.href = r.path;
+      output.append(a);
+    }
+    if (!output.childElementCount) output.textContent = output.dataset.empty || '';
+  });
+</script>

@@ -1,0 +1,266 @@
+---
+import Icon from './Icon.astro';
+import Blueprint from './Blueprint.astro';
+import Status from './Status.astro';
+import { data, source } from '../lib/evidence';
+import { os, link, translator, type Lang } from '../lib/site';
+import provenance from '../../public/validation/provenance.json';
+const { lang } = Astro.props as { lang: Lang };
+const t = translator(lang);
+const highlights = [
+  {
+    id: 'kernel',
+    icon: 'cpu',
+    tag: 'KERNEL',
+    zh: '独立 Rust 内核',
+    en: 'Independent Rust kernel',
+    desc: t(
+      '从页表到用户态隔离，在裸机环境中掌控每一层内存。',
+      'From page tables to isolated address spaces, Rust manages memory on bare metal.',
+    ),
+  },
+  {
+    id: 'filesystem',
+    icon: 'disk',
+    tag: 'STORAGE',
+    zh: '持久化文件系统',
+    en: 'Persistent storage',
+    desc: t(
+      '以统一 VFS 连接 ext2 与受控 ext4，通过 JBD2 重放恢复工作卷。',
+      'A common VFS connects ext2 and controlled ext4, with JBD2 journal recovery.',
+    ),
+  },
+  {
+    id: 'native',
+    icon: 'terminal',
+    tag: 'USERSPACE',
+    zh: '原生应用开发',
+    en: 'Native development',
+    desc: t(
+      '使用 C、C++ 和 Rust 编写应用，在开发桌面完成编辑、构建与运行。',
+      'Write C, C++ and Rust applications, then edit, build and run them in the development desktop.',
+    ),
+  },
+];
+const shots = [
+  {
+    id: 'terminal',
+    k: 'M17.2',
+    name: t('图形终端', 'Graphical terminal'),
+    body: t(
+      '图形 PTY 连接真实 shell。这次会话在来宾系统中用 GCC 编译并运行了一个程序。',
+      'A graphical PTY connects to a real shell. This guest session compiled and ran a program with GCC.',
+    ),
+  },
+  {
+    id: 'files',
+    k: 'M17.3',
+    name: t('文件编辑器', 'File editor'),
+    body: t(
+      '开发者在图形文件界面中打开源文件并编辑内容。验收还覆盖保存和重启后的数据检查。',
+      'The graphical file manager opens source files for editing. The acceptance record also covers saves and checks after reboot.',
+    ),
+  },
+  {
+    id: 'monitor',
+    k: 'M17.4',
+    name: t('资源监视器', 'Resource monitor'),
+    body: t(
+      '资源视图显示来宾系统的运行状态，便于在开发会话中观察资源使用情况。',
+      'The monitor exposes guest resource information during a development session.',
+    ),
+  },
+] as const;
+---
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div class="herotext">
+        <div class="eyebrow">
+          <span class="glowdot"></span>{t('开源操作系统', 'OPEN SOURCE OPERATING SYSTEM')}
+        </div>
+        <h1>Anova<span>OS</span></h1><h2>
+          {t('从零构建。', 'Built from scratch.')}<br /><span
+            >{t('由 Rust 驱动。', 'Powered by Rust.')}</span>
+        </h2>
+        <p class="lead">
+          {
+            t(
+              '面向 x86_64 的独立操作系统。以 Rust 构建内核，为原生应用开发和 Linux 软件兼容性探索打下基础。',
+              'An independent x86_64 operating system with a Rust kernel, native app development, and a growing set of verified Linux interfaces.',
+            )
+          }
+        </p>
+        <div class="actions">
+          <a class="btn primary" href="#highlights"
+            ><Icon name="compass" size={18} />{t('探索 AnovaOS', 'Explore AnovaOS')}</a
+          ><a class="btn" href={os}
+            ><Icon name="github" size={18} />{t('在 GitHub 查看', 'View on GitHub')}</a>
+        </div>
+      </div>
+      <Blueprint lang={lang} />
+    </div>
+    <div class="specbar">
+      {
+        [
+          ['cpu', '目标架构', 'Architecture', 'x86_64'],
+          ['code', '内核语言', 'Kernel language', 'Rust / no_std'],
+          ['box', '引导环境', 'Boot environment', 'UEFI / Limine'],
+          ['branch', '开发分支', 'Development branch', 'dev'],
+        ].map(([icon, zh, en, val]) => (
+          <div>
+            <>
+              <Icon name={icon} size={21} />
+              <div>
+                <>
+                  <small>{t(zh, en)}</small>
+                  <strong>{val}</strong>
+                </>
+              </div>
+            </>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+<section id="highlights" class="section container">
+  <div class="section-head">
+    <div>
+      <div class="kicker">SYSTEM HIGHLIGHTS</div><h2>{t('技术亮点', 'System highlights')}</h2>
+    </div><a class="quiet" href={link(lang, 'features')}
+      >{t('查看全部特性', 'All features')} <Icon name="layer" size={16} /></a>
+  </div>
+  <div class="cards">
+    {
+      highlights.map((item) => (
+        <a class="feature-card" href={link(lang, 'features') + '#' + item.id}>
+          <>
+            <div class="card-top">
+              <>
+                <span class="icon-tile">
+                  <Icon name={item.icon} size={24} />
+                </span>
+                <span class="micro">{item.tag}</span>
+              </>
+            </div>
+            <h3>{t(item.zh, item.en)}</h3>
+            <p>{item.desc}</p>
+          </>
+        </a>
+      ))
+    }
+  </div>
+</section>
+<section class="section container" id="system">
+  <div class="section-head">
+    <div>
+      <div class="kicker">DEVELOPMENT DESKTOP</div><h2>
+        {t('在 AnovaOS 中开发', 'Inside AnovaOS')}
+      </h2>
+    </div><span class="mono muted">QEMU / 800 × 600</span>
+  </div>
+  <div class="showcase">
+    <div class="screenpanel">
+      {
+        shots.map((s, i) => (
+          <a
+            data-shot={s.id}
+            hidden={i !== 0}
+            href={'/validation/' + s.id + '.png'}
+            aria-label={t('打开原始分辨率截图', 'Open full-resolution screenshot')}
+          >
+            <img
+              src={'/validation/' + s.id + '.png'}
+              width="800"
+              height="600"
+              loading="lazy"
+              alt={s.name}
+            />
+          </a>
+        ))
+      }
+    </div><div class="showcopy">
+      <div class="eyebrow">
+        <span class="glowdot"></span>{t('本地 QEMU 验收截图', 'LOCAL QEMU CAPTURE')}
+      </div>{
+        shots.map((s, i) => (
+          <div class="shot-option">
+            <>
+              <button class="shot-btn" data-choose={s.id} aria-expanded={i === 0}>
+                <span>{s.k}</span>
+                {s.name}
+                <Icon name="plus" size={17} />
+              </button>
+              <div data-detail={s.id} hidden={i !== 0}>
+                <>
+                  <p>{s.body}</p>
+                  <a class="text-link" href={provenance[s.id].source}>
+                    {t('查看原始验收记录', 'Read capture record')}
+                  </a>
+                </>
+              </div>
+            </>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+<section class="section container columns">
+  <div>
+    <div class="kicker">ROADMAP</div><h2>{t('开发进度', 'Development progress')}</h2>{
+      data.roadmap.slice(-2).map((m) => (
+        <a class="progress-item" href={link(lang, 'roadmap') + '#' + m.id}>
+          <>
+            <strong class="mono">{m.id}</strong>
+            <span>{t(m.zh, m.en)}</span>
+            <Status lang={lang} status={m.status} />
+          </>
+        </a>
+      ))
+    }
+  </div><div>
+    <div class="kicker">CHANGELOG</div><h2>{t('最新更新', 'Latest changes')}</h2>{
+      data.updates.map((u) => (
+        <a class="update" href={os + '/commit/' + u.sha}>
+          <>
+            <time>{u.date}</time>
+            <span>{t(u.titleZh, u.titleEn)}</span>
+          </>
+        </a>
+      ))
+    }
+  </div>
+</section>
+<section class="container section">
+  <div class="contrib-strip">
+    <div>
+      <div class="kicker">OPEN SOURCE</div><h2>
+        {t('一起构建 AnovaOS', 'Build AnovaOS with us')}
+      </h2><p>
+        {
+          t(
+            '从复现一次启动、验证一个应用，或提交第一个补丁开始。',
+            'Reproduce a boot, qualify an application, or send your first patch.',
+          )
+        }
+      </p>
+    </div><a class="btn" href={link(lang, 'contributing')}
+      ><Icon name="branch" size={18} />{t('参与贡献', 'Get involved')}</a
+    ><a class="sr-only" href={source(lang, 'docs/en/ROADMAP.md')}
+      >{t('上游路线图', 'Upstream roadmap')}</a>
+  </div>
+</section>
+<script>
+  const choices = document.querySelectorAll<HTMLButtonElement>('[data-choose]');
+  choices.forEach((btn) =>
+    btn.addEventListener('click', () => {
+      choices.forEach((b) => b.setAttribute('aria-expanded', String(b === btn)));
+      document.querySelectorAll<HTMLElement>('[data-shot],[data-detail]').forEach((el) => {
+        el.hidden = (el.dataset.shot ?? el.dataset.detail) !== btn.dataset.choose;
+      });
+    }),
+  );
+</script>

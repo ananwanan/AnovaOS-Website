@@ -1,0 +1,47 @@
+---
+import Intro from './Intro.astro';
+import Icon from './Icon.astro';
+import Status from './Status.astro';
+import { data, featureIcons, source } from '../lib/evidence';
+import { link, translator, type Lang } from '../lib/site';
+const { lang } = Astro.props as { lang: Lang };
+const t = translator(lang);
+---
+
+<Intro
+  code="SYSTEM FEATURES"
+  title={t('系统特性', 'System features')}
+  desc={t(
+    '沿着内核、存储和用户空间，查看每项能力的验收范围与当前限制。',
+    'Explore the kernel, storage and user space through their acceptance records and current limits.',
+  )}
+/>
+<section class="section container feature-grid">
+  {
+    data.features.map((f) => (
+      <article class="feature-card" id={f.id}>
+        <>
+          <div class="card-top">
+            <>
+              <span class="icon-tile">
+                <Icon name={featureIcons[f.id]} />
+              </span>
+              <Status lang={lang} status={f.status} />
+            </>
+          </div>
+          <h2>{t(f.zh, f.en)}</h2>
+          <p>{t(f.goalZh, f.goalEn)}</p>
+          <p class="limit">{t(f.detailZh, f.detailEn)}</p>
+          <a class="text-link" href={source(lang, f.doc)}>
+            <Icon name="book" size={16} />
+            {t('技术文档与验证', 'Technical evidence')}
+          </a>
+        </>
+      </article>
+    ))
+  }
+</section>
+<div class="container section">
+  <a class="btn" href={link(lang, 'docs/architecture')}
+    ><Icon name="layer" />{t('阅读系统架构', 'Read the system architecture')}</a>
+</div>

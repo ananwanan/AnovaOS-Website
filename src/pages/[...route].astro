@@ -1,0 +1,65 @@
+---
+import Shell from '../layouts/Shell.astro';
+import Home from '../components/Home.astro';
+import Features from '../components/Features.astro';
+import Download from '../components/Download.astro';
+import Roadmap from '../components/Roadmap.astro';
+import Docs from '../components/Docs.astro';
+import { labels, docs, docNames, translator, type Lang, type Doc } from '../lib/site';
+export function getStaticPaths() {
+  return (['zh', 'en'] as const).flatMap((lang) =>
+    [...Object.keys(labels), ...docs.filter((d) => d !== 'intro').map((d) => 'docs/' + d)].map(
+      (path) => ({
+        params: { route: [lang === 'en' ? 'en' : '', path].filter(Boolean).join('/') || undefined },
+        props: { lang, path },
+      }),
+    ),
+  );
+}
+const { lang, path } = Astro.props as { lang: Lang; path: string };
+const t = translator(lang);
+const section = path.split('/')[0] as keyof typeof labels;
+const id = (path.split('/')[1] || 'intro') as Doc;
+const title =
+  section === 'docs'
+    ? t(...docNames[id])
+    : section === ''
+      ? t('从零构建，由 Rust 驱动', 'Built from scratch. Powered by Rust.')
+      : t(labels[section][0], labels[section][1]);
+const summaries: Record<string, [string, string]> = {
+  '': [
+    '使用 Rust 从零开发的 x86_64 独立操作系统，探索原生应用与 Linux 软件兼容性。',
+    'An independent x86_64 OS built in Rust, exploring native applications and Linux software compatibility.',
+  ],
+  features: [
+    '了解 AnovaOS 的内核、文件系统、原生应用和设备支持及其验证边界。',
+    'Explore the verified scope of the kernel, storage, native applications and devices.',
+  ],
+  roadmap: [
+    '逐项查看 M0 至 M18 的阶段目标、验收与条件。',
+    'Explore M0 to M18 goals, acceptance evidence and prerequisites.',
+  ],
+  download: [
+    '查看正式发行状态、源码构建和 QEMU 启动说明。',
+    'Check release availability, build from source and run AnovaOS in QEMU.',
+  ],
+  contributing: [
+    '了解 AnovaOS 的 Issue、PR、验证流程和许可证。',
+    'Learn how to report issues, submit pull requests and verify contributions.',
+  ],
+  docs: [
+    '阅读 AnovaOS 技术文档和上游验收资料。',
+    'Read AnovaOS technical documentation and upstream validation records.',
+  ],
+};
+const description = (section === 'docs' ? title + ' · ' : '') + t(...summaries[section]);
+---
+
+<Shell {lang} {path} {title} {description}>
+  {section === '' && <Home {lang} />}
+  {section === 'features' && <Features {lang} />}
+  {section === 'roadmap' && <Roadmap {lang} />}
+  {section === 'download' && <Download {lang} />}
+  {section === 'docs' && <Docs {lang} {id} />}
+  {section === 'contributing' && <Docs {lang} id="contributing" standalone />}
+</Shell>

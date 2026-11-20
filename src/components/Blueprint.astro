@@ -1,0 +1,50 @@
+---
+import { translator, type Lang } from '../lib/site';
+const { lang } = Astro.props as { lang: Lang };
+const t = translator(lang);
+---
+
+<figure class="blueprint" aria-label={t('分层架构概念图', 'Conceptual layer diagram')}>
+  <svg
+    class="blueprint-art"
+    viewBox="0 0 650 450"
+    role="img"
+    aria-label={t(
+      '从原生应用、系统调用到 Rust 内核的分层示意',
+      'Native apps, system calls and the Rust kernel in an exploded view',
+    )}
+  >
+    <defs
+      ><pattern id="drawing-grid" width="26" height="26" patternUnits="userSpaceOnUse"
+        ><path d="M26 0H0V26" fill="none" stroke="currentColor" stroke-opacity=".09"></path><circle
+          cx="0"
+          cy="0"
+          r="1.3"
+          fill="currentColor"
+          opacity=".27"></circle></pattern
+      ></defs
+    >
+    <rect width="650" height="450" fill="url(#drawing-grid)"></rect>
+    <image href="/art/architecture.svg" width="650" height="450" />
+    <g class="leader" fill="none" stroke-width="1"
+      ><path d="M347 146 387 107h62M437 225h31l21-21h31M426 298h38l21 21h35"></path><g
+        fill="var(--accent)"
+        ><circle cx="347" cy="146" r="2.5"></circle><circle cx="437" cy="225" r="2.5"
+        ></circle><circle cx="426" cy="298" r="2.5"></circle></g
+      ></g
+    >
+    <g class="drawing-label"
+      ><text x="453" y="111">USER SPACE</text><text x="524" y="208">SYSCALL ABI</text><text
+        x="524"
+        y="323">RUST KERNEL</text
+      ></g
+    >
+    <g stroke="currentColor" opacity=".45"
+      ><path d="M35 55h12m-6-6v12m555 306h12m-6-6v12M50 374h12m-6-6v12"></path></g
+    >
+  </svg>
+  <figcaption>
+    <span class="micro rule">{t('系统架构示意', 'ARCHITECTURE CONCEPT')}</span><span class="micro"
+      >FIG. / x86_64</span>
+  </figcaption>
+</figure>

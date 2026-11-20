@@ -1,0 +1,115 @@
+---
+import { Code } from 'astro:components';
+import Intro from './Intro.astro';
+import Icon from './Icon.astro';
+import { os, link, translator, type Lang } from '../lib/site';
+import snapshot from '../content/releases.json';
+const { lang } = Astro.props as { lang: Lang };
+const t = translator(lang);
+interface Release {
+  tag: string;
+  name: string;
+  url: string;
+  prerelease: boolean;
+  date: string;
+  assets: { name: string; url: string; digest: string | null }[];
+}
+const releases: Release[] = snapshot.releases;
+const commands =
+  'git clone --branch dev https://github.com/ananwanan/AnovaOS.git\ncd AnovaOS\ncargo xtask fetch\ncargo xtask doctor\ncargo xtask build\ncargo xtask apps\ncargo xtask image\ncargo xtask run';
+---
+
+<Intro
+  code="DOWNLOAD & BUILD"
+  title={t('获取 AnovaOS', 'Get AnovaOS')}
+  desc={t(
+    '查看上游发布资产，或从开发分支构建自己的 UEFI 启动镜像。',
+    'Browse upstream release assets or build a UEFI boot image from the development branch.',
+  )}
+/>
+<section class="container section download-layout">
+  <div>
+    <div class="panel">
+      <div class="card-top">
+        <span class="icon-tile"><Icon name="download" /></span><span class="micro"
+          >GITHUB RELEASES</span>
+      </div><h2>
+        {
+          releases.some((r) => !r.prerelease)
+            ? t('正式公开发行版', 'Public releases')
+            : t('尚无正式公开发行版', 'No official public release yet')
+        }
+      </h2><p>
+        {t('发布记录核对日期', 'Release snapshot checked')}
+        <time>{snapshot.checked}</time> · {
+          t('最新状态以上游 Releases 为准。', 'See upstream Releases for the latest changes.')
+        }
+      </p>{
+        releases.map((r) => (
+          <article class="release">
+            <>
+              <a class="text-link" href={r.url}>
+                {r.name} · {r.tag}
+              </a>
+              <p>
+                {r.date} {r.prerelease ? t('预发行', 'Prerelease') : ''}
+              </p>
+              <ul>
+                {r.assets.map((a) => (
+                  <li>
+                    <a href={a.url}>{a.name}</a>
+                    {a.digest && <code>{a.digest}</code>}
+                  </li>
+                ))}
+              </ul>
+            </>
+          </article>
+        ))
+      }<div class="actions">
+        <a class="btn" href={os + '/releases'}><Icon name="github" size={17} />GitHub Releases</a><a
+          class="text-link"
+          href={os + '/tree/dev'}>{t('下载或克隆源码', 'Get the source')}</a>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="kicker">FROM SOURCE</div><h2>{t('从源码启动', 'Boot from source')}</h2><p>
+        {
+          t(
+            '先按开发环境指南准备宿主依赖，再在 Linux 或已验证的 WSL2 环境中执行。',
+            'Prepare the host dependencies in the environment guide, then run these commands on Linux or the documented WSL2 profile.',
+          )
+        }
+      </p><Code code={commands} lang="bash" theme="github-dark" /><a
+        class="text-link"
+        href={link(lang, 'docs/environment')}
+        >{t('准备开发环境', 'Prepare the build environment')}</a>
+    </div>
+  </div>
+  <aside class="panel side-panel">
+    <div class="kicker">TARGET PROFILE</div><h2>{t('运行环境', 'Machine profile')}</h2><dl>
+      {
+        [
+          ['架构', 'Architecture', 'x86_64'],
+          ['固件', 'Firmware', 'UEFI / OVMF'],
+          ['机型', 'Machine', 'QEMU q35'],
+          ['引导', 'Bootloader', 'Limine'],
+        ].map(([zh, en, v]) => (
+          <div>
+            <>
+              <dt>{t(zh, en)}</dt>
+              <dd>{v}</dd>
+            </>
+          </div>
+        ))
+      }
+    </dl><p>
+      {
+        t(
+          '验证覆盖指定的虚拟机配置。物理设备需要单独验证。',
+          'Validation covers the documented virtual machine. Physical devices require separate qualification.',
+        )
+      }
+    </p><a class="text-link" href={link(lang, 'docs/qemu')}
+      >{t('阅读 QEMU 指南', 'Read the QEMU guide')}</a>
+  </aside>
+</section>

@@ -1,0 +1,29 @@
+{
+  "terminal": {
+    "source": "https://github.com/ananwanan/AnovaOS/blob/a2a16a635d961713a7fd1b802234626a8b82c0cc/docs/assets/validation/M17_PTY_LOCAL.json",
+    "record": [
+      "screenshots",
+      "compiled-run"
+    ],
+    "sha256": "131fbcb9cd4da79acb24de2e94f364a4d047330ba8ae4a10505e9c2472462887",
+    "bytes": 1440015
+  },
+  "files": {
+    "source": "https://github.com/ananwanan/AnovaOS/blob/a2a16a635d961713a7fd1b802234626a8b82c0cc/docs/assets/validation/M17_FILES_LOCAL.json",
+    "record": [
+      "artifacts",
+      "build/desktop-files-test/graphical-editor.ppm"
+    ],
+    "sha256": "dd6ad5d6709021735c958b531a293a655b0cbaafa5bfc46292033d9b98058dd6",
+    "bytes": 1440015
+  },
+  "monitor": {
+    "source": "https://github.com/ananwanan/AnovaOS/blob/a2a16a635d961713a7fd1b802234626a8b82c0cc/docs/assets/validation/M17_MONITOR_LOCAL.json",
+    "record": [
+      "accepted",
+      "resources.ppm"
+    ],
+    "sha256": "8462e94cf3f2156165635f3b967e9af27c209962ceb15021dd2b74b2bcd97ecf",
+    "bytes": 1440015
+  }
+}

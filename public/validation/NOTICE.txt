@@ -1,0 +1,6 @@
+AnovaOS
+Copyright 2026 ananwanan and the AnovaOS contributors
+
+This product includes software developed for the AnovaOS project.
+These files reproduce QEMU scanouts of the actual AnovaOS M17 local validation profiles.
+Original PPM images were losslessly re-encoded as PNG. See provenance.json for upstream archive, record key and original SHA-256.

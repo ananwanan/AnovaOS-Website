@@ -1,0 +1,68 @@
+name: Build and deliver website
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+concurrency:
+  group: website-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+env:
+  ASTRO_TELEMETRY_DISABLED: '1'
+  SITE_URL: ${{ vars.SITE_URL }}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm build
+      - run: pnpm verify
+      - uses: actions/upload-artifact@v4
+        with:
+          name: website-${{ github.sha }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14
+  deploy:
+    needs: build
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      vars.RUNNER_READY == 'true' && vars.SITE_URL != '' &&
+      (github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && vars.AUTO_DEPLOY == 'true'))
+    runs-on: [self-hosted, linux, anova-site-prod]
+    environment: production
+    concurrency:
+      group: anova-site-production
+      cancel-in-progress: false
+    steps:
+      - name: Make isolated artifact directory
+        id: stage
+        shell: bash
+        run: echo "path=$(mktemp -d "$RUNNER_TEMP/anova.XXXXXXXX")" >> "$GITHUB_OUTPUT"
+      - uses: actions/download-artifact@v4
+        with:
+          name: website-${{ github.sha }}
+          path: ${{ steps.stage.outputs.path }}
+      - name: Publish this main build
+        env:
+          DIST: ${{ steps.stage.outputs.path }}
+        run: /usr/local/libexec/anova-site-release publish "$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" "$DIST"
+      - name: Clean temporary files
+        if: always() && steps.stage.outcome == 'success'
+        env:
+          DIST: ${{ steps.stage.outputs.path }}
+        run: rm -rf -- "$DIST"
+

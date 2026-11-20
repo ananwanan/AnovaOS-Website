@@ -1,0 +1,47 @@
+---
+interface Props {
+  name: string;
+  size?: number;
+}
+const { name, size = 20 } = Astro.props;
+const lines: Record<string, string> = {
+  explore: 'M12 2 3 7l9 5 9-5-9-5Zm-9 10 9 5 9-5M3 17l9 5 9-5',
+  cpu: 'M8 8h8v8H8zM5 5h14v14H5zM9 2v3m6-3v3M9 19v3m6-3v3M2 9h3m-3 6h3m14-6h3m-3 6h3',
+  github:
+    'M9 20c-3 .8-3-1.5-4-2m11 4v-3.8c0-1-.4-1.6-.8-2 2.8-.3 5.8-1.4 5.8-6.3 0-1.4-.5-2.6-1.3-3.5.2-.4.6-1.8-.1-3.4 0 0-1.1-.4-3.6 1.3a12 12 0 0 0-6 0C6.5 2.6 5.4 3 5.4 3c-.7 1.6-.3 3-.1 3.4A5 5 0 0 0 4 9.9c0 4.9 3 6 5.8 6.3-.4.4-.8 1.1-.8 2V22',
+  lang: 'm3 5 11 0M8.5 2v3M5 8c1 3 3 5 6 7m1-10c-.5 4-4 9-9 11m10 5 4-11 4 11m-7-3h6',
+  sun: 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5',
+  moon: 'M20.8 13A9 9 0 0 1 11 3.2 9 9 0 1 0 20.8 13Z',
+  book: 'M12 5c-3-2-6-2-10-1v15c4-1 7-1 10 1 3-2 6-2 10-1V4c-4-1-7-1-10 1Zm0 0v15',
+  terminal: 'M3 4h18v16H3zM6.5 9l3 3-3 3m6 0h5',
+  disk: 'M3 14 6 5h12l3 9v5H3v-5Zm0 0h18m-5 3h2',
+  code: 'm8 7-5 5 5 5m8-10 5 5-5 5m-3-14-2 18',
+  layer: 'm12 2 10 5-10 5L2 7l10-5Zm-10 10 10 5 10-5M2 17l10 5 10-5',
+  branch:
+    'M7 4a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm10-12a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM7 8v8m0-3c6 0 10-1 10-5',
+  menu: 'M3 6h18M3 12h18M3 18h18',
+  close: 'm5 5 14 14M19 5 5 19',
+  search: 'M10 3a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm5 12 6 6',
+  box: 'm12 2 9 5v10l-9 5-9-5V7l9-5ZM3 7l9 5 9-5m-9 5v10',
+  screen: 'M2 4h20v13H2zM8 21h8m-4-4v4',
+  network: 'M9 2h6v5H9zM2 17h6v5H2zm14 0h6v5h-6zM12 7v5H5v5m7-5h7v5',
+  plus: 'M5 12h14m-7-7v14',
+  check: 'm4 12 5 5L20 6',
+  file: 'M5 2h8l6 6v14H5zM13 2v7h6M8 13h8m-8 4h6',
+  download: 'M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5',
+  copy: 'M8 8h12v13H8zM5 16H3V3h13v2',
+  compass: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm4 6-2.5 5.5L8 16l2.5-5.5L16 8Z',
+};
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.6"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"><path d={lines[name] || lines.file}></path></svg
+>
